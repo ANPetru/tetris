@@ -26,38 +26,43 @@ public class Tetris extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        scoreBoard1 = new ScoreBoard();
-        board2 = new Board();
+        scoreBoard = new ScoreBoard();
+        board = new Board();
         jMenuBar2 = new javax.swing.JMenuBar();
-        jMenu6 = new javax.swing.JMenu();
-        jMenuItem2 = new javax.swing.JMenuItem();
+        Jmenu3 = new javax.swing.JMenu();
+        jMenuItemInitGame = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
         jMenu5 = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        scoreBoard1.setText("scoreBoard1");
-        getContentPane().add(scoreBoard1, java.awt.BorderLayout.PAGE_END);
+        scoreBoard.setText("scoreBoard1");
+        getContentPane().add(scoreBoard, java.awt.BorderLayout.PAGE_END);
 
-        javax.swing.GroupLayout board2Layout = new javax.swing.GroupLayout(board2);
-        board2.setLayout(board2Layout);
-        board2Layout.setHorizontalGroup(
-            board2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout boardLayout = new javax.swing.GroupLayout(board);
+        board.setLayout(boardLayout);
+        boardLayout.setHorizontalGroup(
+            boardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 295, Short.MAX_VALUE)
         );
-        board2Layout.setVerticalGroup(
-            board2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        boardLayout.setVerticalGroup(
+            boardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 369, Short.MAX_VALUE)
         );
 
-        getContentPane().add(board2, java.awt.BorderLayout.CENTER);
+        getContentPane().add(board, java.awt.BorderLayout.CENTER);
 
-        jMenu6.setText("Game");
+        Jmenu3.setText("Game");
 
-        jMenuItem2.setText("init game");
-        jMenu6.add(jMenuItem2);
+        jMenuItemInitGame.setText("init game");
+        jMenuItemInitGame.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemInitGameActionPerformed(evt);
+            }
+        });
+        Jmenu3.add(jMenuItemInitGame);
 
-        jMenuBar2.add(jMenu6);
+        jMenuBar2.add(Jmenu3);
 
         jMenu4.setText("File");
         jMenuBar2.add(jMenu4);
@@ -69,6 +74,10 @@ public class Tetris extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jMenuItemInitGameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemInitGameActionPerformed
+        board.initGame();
+    }//GEN-LAST:event_jMenuItemInitGameActionPerformed
 
     /**
      * @param args the command line arguments
@@ -106,12 +115,12 @@ public class Tetris extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private Board board2;
+    private javax.swing.JMenu Jmenu3;
+    private Board board;
     private javax.swing.JMenu jMenu4;
     private javax.swing.JMenu jMenu5;
-    private javax.swing.JMenu jMenu6;
     private javax.swing.JMenuBar jMenuBar2;
-    private javax.swing.JMenuItem jMenuItem2;
-    private ScoreBoard scoreBoard1;
+    private javax.swing.JMenuItem jMenuItemInitGame;
+    private ScoreBoard scoreBoard;
     // End of variables declaration//GEN-END:variables
 }
