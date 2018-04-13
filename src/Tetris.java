@@ -77,6 +77,7 @@ public class Tetris extends javax.swing.JFrame {
 
     private void jMenuItemInitGameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemInitGameActionPerformed
         board.initGame();
+        board.setScorer(scoreBoard);
     }//GEN-LAST:event_jMenuItemInitGameActionPerformed
 
     /**

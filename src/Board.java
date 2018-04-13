@@ -23,28 +23,38 @@ public class Board extends JPanel implements ActionListener {
 
         @Override
         public void keyPressed(KeyEvent e) {
+            
             switch (e.getKeyCode()) {
                 case KeyEvent.VK_LEFT:
-                    if (canMoveTo(currentShape,currentRow, currentCol - 1)) {
+                    if (canMoveTo(currentShape, currentRow, currentCol - 1) && !isPaused) {
                         currentCol--;
                     }
                     break;
                 case KeyEvent.VK_RIGHT:
-                    if (canMoveTo(currentShape,currentRow, currentCol + 1)) {
+                    if (canMoveTo(currentShape, currentRow, currentCol + 1) && !isPaused) {
                         currentCol++;
                     }
                     break;
                 case KeyEvent.VK_UP:
                     Shape rotShape = currentShape.rotateRight();
-                    if(canMoveTo(rotShape,currentRow,currentCol)){
-                        currentShape=rotShape;
+                    if (canMoveTo(rotShape, currentRow, currentCol) && !isPaused) {
+                        currentShape = rotShape;
                     }
                     break;
                 case KeyEvent.VK_DOWN:
-                    if (canMoveTo(currentShape,currentRow + 1, currentCol)) {
+                    if (canMoveTo(currentShape, currentRow + 1, currentCol)&& !isPaused) {
                         currentRow++;
                     }
                     break;
+                case KeyEvent.VK_P:
+                   if(timer.isRunning()){
+                       timer.stop();
+                       isPaused=true;
+                   } else {
+                       timer.start();
+                       isPaused=false;
+                   }
+                   break;
                 default:
                     break;
             }
@@ -57,6 +67,7 @@ public class Board extends JPanel implements ActionListener {
     public static final int INIT_ROW = -2;
     private MyKeyAdapter keyAdapter;
 
+    public IncrementScorer scorerDelegate;
     private Tetrominoes[][] matrix;
     private int deltaTime;
 
@@ -67,6 +78,8 @@ public class Board extends JPanel implements ActionListener {
 
     private Timer timer;
 
+    private boolean isPaused;
+    
     public Board() {
         super();
         matrix = new Tetrominoes[NUM_ROWS][NUM_COLS];
@@ -82,13 +95,17 @@ public class Board extends JPanel implements ActionListener {
         currentShape = null;
         currentRow = INIT_ROW;
         currentCol = NUM_COLS / 2;
-
+        isPaused=false;
     }
 
     public void initGame() {
         initValues();
         currentShape = new Shape();
         timer.start();
+        removeKeyListener(keyAdapter);
+        if (scorerDelegate != null) {
+            scorerDelegate.reset();
+        }
         addKeyListener(keyAdapter);
 
     }
@@ -103,7 +120,7 @@ public class Board extends JPanel implements ActionListener {
             moveCurrentShapeToMatrix();
             currentShape = new Shape();
             currentRow = INIT_ROW;
-            currentCol = NUM_COLS/2;
+            currentCol = NUM_COLS / 2;
         }
     }
 
@@ -114,6 +131,7 @@ public class Board extends JPanel implements ActionListener {
             int col = squaresArray[point][0] + currentCol;
             matrix[row][col] = currentShape.getShape();
         }
+        checkColumns();
     }
 
     public void cleanBoard() {
@@ -126,10 +144,44 @@ public class Board extends JPanel implements ActionListener {
     }
 
     private boolean canMoveTo(Shape shape, int newRow, int newCol) {
-        if ((newCol + shape.getXMin() < 0) || (newCol + shape.getXMax() >= NUM_COLS) || (newRow + shape.getYMax() >= NUM_ROWS) || hitWithMatrix(shape,newRow, newCol)) {
+        if ((newCol + shape.getXMin() < 0) || (newCol + shape.getXMax() >= NUM_COLS) || (newRow + shape.getYMax() >= NUM_ROWS) || hitWithMatrix(shape, newRow, newCol)) {
             return false;
         }
         return true;
+    }
+
+    private void checkColumns() {
+        for (int row = 0; row < NUM_ROWS; row++) {
+            int acc = NUM_COLS;
+            for (int col = 0; col < NUM_COLS; col++) {
+                if (matrix[row][col] != Tetrominoes.NoShape) {
+                    acc--;
+                }
+            }
+            if (acc == 0) {
+                removeLine(row);
+                repaint();
+                scorerDelegate.increment(1);
+
+            }
+        }
+    }
+
+    public void setScorer(IncrementScorer scorer) {
+        this.scorerDelegate = scorer;
+    }
+
+    private void removeLine(int numRow) {
+
+        for (int row = numRow; row > 0; row--) {
+            for (int col = 0; col < NUM_COLS; col++) {
+                matrix[row][col] = matrix[row - 1][col];
+            }
+        }
+
+        for (int col = 0; col < NUM_COLS; col++) {
+            matrix[0][col] = Tetrominoes.NoShape;
+        }
     }
 
     private boolean hitWithMatrix(Shape shape, int newRow, int newCol) {
