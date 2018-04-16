@@ -5,6 +5,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
@@ -23,7 +26,7 @@ public class Board extends JPanel implements ActionListener {
 
         @Override
         public void keyPressed(KeyEvent e) {
-            
+
             switch (e.getKeyCode()) {
                 case KeyEvent.VK_LEFT:
                     if (canMoveTo(currentShape, currentRow, currentCol - 1) && !isPaused) {
@@ -42,19 +45,19 @@ public class Board extends JPanel implements ActionListener {
                     }
                     break;
                 case KeyEvent.VK_DOWN:
-                    if (canMoveTo(currentShape, currentRow + 1, currentCol)&& !isPaused) {
+                    if (canMoveTo(currentShape, currentRow + 1, currentCol) && !isPaused) {
                         currentRow++;
                     }
                     break;
                 case KeyEvent.VK_P:
-                   if(timer.isRunning()){
-                       timer.stop();
-                       isPaused=true;
-                   } else {
-                       timer.start();
-                       isPaused=false;
-                   }
-                   break;
+                    if (timer.isRunning()) {
+                        timer.stop();
+                        isPaused = true;
+                    } else {
+                        timer.start();
+                        isPaused = false;
+                    }
+                    break;
                 default:
                     break;
             }
@@ -79,7 +82,7 @@ public class Board extends JPanel implements ActionListener {
     private Timer timer;
 
     private boolean isPaused;
-    
+
     public Board() {
         super();
         matrix = new Tetrominoes[NUM_ROWS][NUM_COLS];
@@ -95,7 +98,7 @@ public class Board extends JPanel implements ActionListener {
         currentShape = null;
         currentRow = INIT_ROW;
         currentCol = NUM_COLS / 2;
-        isPaused=false;
+        isPaused = false;
     }
 
     public void initGame() {
@@ -129,9 +132,49 @@ public class Board extends JPanel implements ActionListener {
         for (int point = 0; point < 4; point++) {
             int row = squaresArray[point][1] + currentRow;
             int col = squaresArray[point][0] + currentCol;
-            matrix[row][col] = currentShape.getShape();
+            if (row < 0) {
+                gameOver();
+                return;
+            } else {
+                matrix[row][col] = currentShape.getShape();
+            }
         }
         checkColumns();
+    }
+
+    private void gameOver() {
+        timer.stop();
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for (int row = 0; row < NUM_ROWS; row++) {
+                    for (int col = 0; col < NUM_COLS; col++) {
+                        matrix[row][col] = Tetrominoes.LineShape;
+                        repaint();
+                        try {
+                            Thread.sleep(20);
+                        } catch (InterruptedException ex) {
+                            Logger.getLogger(Board.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                }
+                showRestart();
+            }
+        });
+
+        t.start();
+
+    }
+
+    private void showRestart() {
+
+        int n = JOptionPane.showConfirmDialog(this, "Score :" + scorerDelegate.getScore() + "\n Play Again?", "GAME OVER", JOptionPane.YES_NO_OPTION);
+        System.out.println("sad");
+        if (n == 0) {
+            initGame();
+        } else {
+            System.exit(0);
+        }
     }
 
     public void cleanBoard() {
@@ -159,10 +202,15 @@ public class Board extends JPanel implements ActionListener {
                 }
             }
             if (acc == 0) {
+
                 removeLine(row);
+
                 repaint();
                 scorerDelegate.increment(1);
 
+                if (scorerDelegate.getScore() % 5 == 0) {
+                    deltaTime -= 100;
+                }
             }
         }
     }

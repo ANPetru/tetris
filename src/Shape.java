@@ -52,7 +52,7 @@ public class Shape {
             rotateShape.coordinates[point][0] = coordinates[point][0];
             rotateShape.coordinates[point][1] = coordinates[point][1];
         }
-
+        
         if (pieceShape != Tetrominoes.SquareShape) {
 
             for (int point = 0; point < 4; point++) {
