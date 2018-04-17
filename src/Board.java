@@ -58,6 +58,19 @@ public class Board extends JPanel implements ActionListener {
                         isPaused = false;
                     }
                     break;
+                case KeyEvent.VK_C:
+                    if (canSavePiece) {
+                        Shape temp = savePiece.setPieceShape(currentShape);
+                        if (temp == null) {
+                            currentShape = nextPiece.getShape();
+                            nextPiece.changeShape(Shape.getRandomShape());
+                            changeCurrentPos();
+                        } else {
+                            currentShape = temp;
+                            changeCurrentPos();
+                        }
+                        canSavePiece=false;
+                    }
                 default:
                     break;
             }
@@ -78,9 +91,11 @@ public class Board extends JPanel implements ActionListener {
 
     private int currentRow;
     private int currentCol;
-
+    private NextPiece nextPiece;
+    private SavePiece savePiece;
     private Timer timer;
 
+    private boolean canSavePiece;
     private boolean isPaused;
 
     public Board() {
@@ -89,6 +104,7 @@ public class Board extends JPanel implements ActionListener {
         keyAdapter = new MyKeyAdapter();
         initValues();
         timer = new Timer(deltaTime, this);
+        canSavePiece = true;
     }
 
     public void initValues() {
@@ -104,6 +120,7 @@ public class Board extends JPanel implements ActionListener {
     public void initGame() {
         initValues();
         currentShape = new Shape();
+
         timer.start();
         removeKeyListener(keyAdapter);
         if (scorerDelegate != null) {
@@ -121,10 +138,16 @@ public class Board extends JPanel implements ActionListener {
             repaint();
         } else {
             moveCurrentShapeToMatrix();
-            currentShape = new Shape();
-            currentRow = INIT_ROW;
-            currentCol = NUM_COLS / 2;
+            currentShape = nextPiece.getShape();
+            nextPiece.changeShape(Shape.getRandomShape());
+            changeCurrentPos();
+            canSavePiece=true;
         }
+    }
+
+    private void changeCurrentPos() {
+        currentRow = INIT_ROW;
+        currentCol = NUM_COLS / 2;
     }
 
     public void moveCurrentShapeToMatrix() {
@@ -140,6 +163,14 @@ public class Board extends JPanel implements ActionListener {
             }
         }
         checkColumns();
+    }
+
+    public void setNextPiece(NextPiece np) {
+        nextPiece = np;
+    }
+
+    public void setSavedPiece(SavePiece sp) {
+        savePiece = sp;
     }
 
     private void gameOver() {
